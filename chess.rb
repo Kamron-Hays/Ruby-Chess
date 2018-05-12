@@ -48,8 +48,9 @@ class Chess
       puts (@side == :white) ? "Black wins!" : "White wins!"
     elsif input == "help" || input == "h"
       display_help
-    elsif input.match(/[a-h][1-8][a-h][1-8]/)
-      success = @board.execute_move(input)
+    elsif @board.valid_move?(input)
+      success, message = @board.execute_move(input, @side)
+      puts message if message
       if success
         @side = (@side == :white) ? :black : :white
       else
@@ -70,7 +71,8 @@ class Chess
   
   def play
     loop do
-      @board = ChessBoard.new
+      @board = Board.new
+      @board.setup
       @resign = false
       @side = :white
 
@@ -85,7 +87,7 @@ class Chess
       loop do
         display_board
 
-        if @board.in_check?(@side)
+        if @board.check?(@side)
           if @board.mate?(@side)
             opponent = (@side == :white) ? "Black" : "White"
             puts "Checkmate! #{opponent} wins!"

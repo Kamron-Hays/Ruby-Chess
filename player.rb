@@ -7,7 +7,8 @@ class Player
 
   def get_input
     print (@side == :white) ? "White's turn: " : "Black's turn: "
-    return gets.strip.downcase
+    # remove all whitespace and convert remaining characters to lower case
+    return gets.gsub(/\s+/, "").downcase
   end
 end
 
