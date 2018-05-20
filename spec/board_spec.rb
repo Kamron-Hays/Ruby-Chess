@@ -134,7 +134,108 @@ describe Board do
     #########################
 
     context "Given a knight" do
-      # make sure knight moves properly
+      it "Follows knight movement rules" do
+        piece = Knight.new("e4", :white, subject)
+        status, message = subject.execute_move("e4d6", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d6e4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("e4c5", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("c5e4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("e4g5", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("g5e4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("e4f6", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("f6e4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("e4e5", :white)
+        expect(status).to be false
+        status, message = subject.execute_move("e4d5", :white)
+        expect(status).to be false
+      end
+
+      it "Is able to jump over other pieces" do
+        knight = Knight.new("e4", :white, subject)
+        queen = Queen.new("e5", :black, subject)
+        pawn = Pawn.new("d5", :black, subject)
+        status, message = subject.execute_move("e4c5", :white)
+        expect(status).to be true
+      end
+
+      it "Can capture opponent pieces" do
+        knight = Knight.new("e4", :white, subject)
+        queen = Queen.new("c5", :black, subject)
+        status, message = subject.execute_move("e4c5", :white)
+        expect(subject.black_captured[0]).to be queen
+      end
+    end
+
+    #########################
+    # Test bishop movements #
+    #########################
+
+    context "Given a bishop" do
+      it "Can move diagonally" do
+        piece = Bishop.new("d4", :white, subject)
+        status, message = subject.execute_move("d4a7", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("a7d4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d4h8", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("h8d4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d4a1", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("a1d4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d4g1", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("g1d4", :white)
+        expect(status).to be true
+      end
+
+      it "Can't move horizontally or vertically" do
+        piece = Bishop.new("d5", :white, subject)
+        status, message = subject.execute_move("d5c5", :white)
+        expect(status).to be false
+        status, message = subject.execute_move("d5d6", :white)
+        expect(status).to be false
+        status, message = subject.execute_move("d5e5", :white)
+        expect(status).to be false
+        status, message = subject.execute_move("d5d4", :white)
+        expect(status).to be false
+      end
+
+      it "Can't jump pieces when sliding" do
+        piece = Bishop.new("a1", :black, subject)
+        pawn = Pawn.new("g7", :black, subject)
+        status, message = subject.execute_move("a1h8", :black)
+        expect(status).to be false
+        status, message = subject.execute_move("a1g7", :black)
+        expect(status).to be false
+        status, message = subject.execute_move("a1f6", :black)
+        expect(status).to be true
+      end
+
+      it "Can slide to capture opponent's piece" do
+        piece = Bishop.new("f2", :black, subject)
+        queen = Queen.new("b6", :white, subject)
+        status, message = subject.execute_move("f2b6", :black)
+        expect(status).to be true
+        expect(subject.white_captured[0]).to be queen
+      end
+
+      it "Can't slide past opponent's piece" do
+        piece = Bishop.new("f2", :white, subject)
+        queen = Queen.new("b6", :black, subject)
+        status, message = subject.execute_move("f2a7", :white)
+        expect(status).to be false
+      end
     end
 
     #######################
@@ -142,7 +243,7 @@ describe Board do
     #######################
 
     context "Given a rook" do
-      it "Can move forward, backward, and laterally" do
+      it "Can move horizontally and vertically" do
         piece = Rook.new("d5", :white, subject)
         status, message = subject.execute_move("d5d8", :white)
         expect(status).to be true
@@ -158,13 +259,13 @@ describe Board do
         expect(status).to be true
       end
 
-      it "Must stop sliding when it runs into another piece" do
+      it "Must stop sliding when it runs into friendly piece" do
         piece = Rook.new("a3", :black, subject)
         pawn = Pawn.new("h3", :black, subject)
+        status, message = subject.execute_move("a3h3", :black)
+        expect(status).to be false
         status, message = subject.execute_move("a3g3", :black)
         expect(status).to be true
-        status, message = subject.execute_move("g3h3", :black)
-        expect(status).to be false
       end
 
       it "Can slide to capture opponent's piece" do
@@ -195,11 +296,107 @@ describe Board do
       end
     end
 
+    ########################
+    # Test Queen movements #
+    ########################
+
+    context "Given a queen" do
+      it "Can slide in any direction" do
+        piece = Queen.new("d5", :white, subject)
+        status, message = subject.execute_move("d5a5", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("a5d5", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d5a8", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("a8d5", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d5d8", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d8d5", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d5g8", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("g8d5", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d5h5", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("h5d5", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d5h1", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("h1d5", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d5d1", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d1d5", :white)
+        expect(status).to be true
+      end
+
+      it "Can't jump pieces when sliding" do
+        piece = Queen.new("a1", :black, subject)
+        pawn = Pawn.new("g7", :black, subject)
+        status, message = subject.execute_move("a1h8", :black)
+        expect(status).to be false
+        status, message = subject.execute_move("a1g7", :black)
+        expect(status).to be false
+        status, message = subject.execute_move("a1f6", :black)
+        expect(status).to be true
+      end
+
+      it "Can slide to capture opponent's piece" do
+        piece = Queen.new("f2", :black, subject)
+        queen = Queen.new("b6", :white, subject)
+        status, message = subject.execute_move("f2b6", :black)
+        expect(status).to be true
+        expect(subject.white_captured[0]).to be queen
+      end
+
+      it "Can't slide past opponent's piece" do
+        piece = Queen.new("f2", :white, subject)
+        queen = Queen.new("b6", :black, subject)
+        status, message = subject.execute_move("f2a7", :white)
+        expect(status).to be false
+      end
+    end
+
     #######################
     # Test King movements #
     #######################
 
     context "Given a king" do
+
+      it "Can move one square in all directions" do
+        king = King.new("c4", :white, subject)
+        status, message = subject.execute_move("c4c5", :white)
+        expect(status).to be true
+        expect(subject.get("c4")).to be nil
+        expect(subject.get("c5")).to be king
+        status, message = subject.execute_move("c5c4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("c4b4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("b4c4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("c4b5", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("b5c4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("c4d3", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("d3c4", :white)
+        expect(status).to be true
+        expect(subject.get("c4")).to be king
+      end
+
+      it "Can't move further than one square" do
+        king = King.new("g6", :black, subject)
+        status, message = subject.execute_move("g6g4", :black)
+        expect(status).to be false
+        expect(subject.get("g6")).to be king
+        expect(subject.get("g4")).to be nil
+      end
+
       it "Can't move into check" do
         King.new("e1", :white, subject)
         Queen.new("f3", :black, subject)
@@ -210,4 +407,80 @@ describe Board do
     end
   end
 
+  describe "#in_check?(side) and #mate?(side)" do
+
+    it "Properly detects Fool's Mate" do
+      subject.setup
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:black)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("f2f3", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:black)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("e7e6", :black)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:black)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("g2g4", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:black)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("d8h4", :black)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.in_check?(:white)).to be true
+      expect(subject.mate?(:black)).to be false
+      expect(subject.mate?(:white)).to be true
+    end
+
+    it "Properly detects checkmate with two rooks" do
+      King.new("d8", :black, subject)
+      King.new("c2", :white, subject)
+      Rook.new("a7", :white, subject)
+      Rook.new("h1", :white, subject)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:black)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("h1h8", :white)
+      expect(subject.in_check?(:black)).to be true
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:black)).to be true
+      expect(subject.mate?(:white)).to be false
+    end
+
+    it "Properly detects checkmate with queen guarded by king" do
+      King.new("h6", :black, subject)
+      King.new("f5", :white, subject)
+      Queen.new("e8", :white, subject)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:black)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("e8g6", :white)
+      expect(subject.in_check?(:black)).to be true
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:black)).to be true
+      expect(subject.mate?(:white)).to be false
+    end
+
+    it "Properly detects stalemate" do
+      King.new("h8", :black, subject)
+      King.new("d2", :white, subject)
+      Queen.new("e6", :white, subject)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:black)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("e6f7", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:black)).to be true
+      expect(subject.mate?(:white)).to be false
+    end
+  end
 end
