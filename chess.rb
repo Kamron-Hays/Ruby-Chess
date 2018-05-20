@@ -12,7 +12,7 @@ class Chess
     @black = nil
     @board = nil
     @done = false
-    @resign = false
+    @game_over = false
     @skip_board_draw = false
   end
 
@@ -44,7 +44,7 @@ class Chess
     elsif input == "exit" || input == "quit"
       @done = true
     elsif input == "resign"
-      @resign = true
+      @game_over = true
       puts (@side == :white) ? "Black wins!" : "White wins!"
     elsif input == "help" || input == "h"
       display_help
@@ -87,21 +87,23 @@ class Chess
       loop do
         display_board
 
-        if @board.check?(@side)
+        if @board.in_check?(@side)
           if @board.mate?(@side)
             opponent = (@side == :white) ? "Black" : "White"
             puts "Checkmate! #{opponent} wins!"
+            @game_over = true
             break
           else
             puts "Check!"
           end
-        elsif @board.stalemate?(@player)
+        elsif @board.mate?(@side)
           puts "Stalemate!"
+          @game_over = true
           break
         end
 
-        process_input
-        break if @done || @resign
+        process_input if !@game_over
+        break if @done || @game_over
       end
 
       break if @done

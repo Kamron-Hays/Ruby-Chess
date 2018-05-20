@@ -6,7 +6,7 @@ class Piece
   # size should be either :white or :black
   # board is the Board where the piece will be placed
   def initialize(square, side, board)
-    @position = board.to_xy(square)
+    @position = Board.to_xy(square)
     @side = side
     @board = board
     @board.add(self)
