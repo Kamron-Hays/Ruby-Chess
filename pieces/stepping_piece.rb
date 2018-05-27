@@ -4,7 +4,7 @@ class SteppingPiece < Piece
   def get_moves
     moves = []
     x,y = @position
-    @rules.each do |rule|
+    get_rules.each do |rule|
       add_move(moves, x + rule[0], y + rule[1])
     end
     moves

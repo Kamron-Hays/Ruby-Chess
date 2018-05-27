@@ -1,10 +1,16 @@
 require_relative "sliding_piece"
 
 class Bishop < SlidingPiece
+
+  @@RULES = [[-1,1], [1,1], [-1,-1], [1,-1]]
+
   def initialize(square, side, board)
     super(square, side, board)
-    @name = "Bishop"
-    @rules = [[-1,1], [1,1], [-1,-1], [1,-1]]
+    @name = "bishop"
+  end
+
+  def get_rules
+    @@RULES
   end
 
   def to_s

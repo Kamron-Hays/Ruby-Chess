@@ -38,19 +38,69 @@ class Board
   # Makes a deep copy of this board and all pieces on the board.
   def copy
     board = Board.new
+    board.white_king = @white_king
+    board.black_king = @black_king
+
     (0..7).each do |x|
       (0..7).each do |y|
         piece = @squares[x][y]
         next if piece == nil
         new_piece = piece.class.new(Board.to_alg(piece.position), piece.side, board)
+        new_piece.moved = piece.moved
+        new_piece.attacked = piece.attacked
       end
     end
     board
   end
 
+  # Updates the "attacked" status for the specified piece, as well as any
+  # pieces under attack by the specified piece.
+  def update_attacks(piece)
+    piece.attacked = attacked?(piece.position, piece.side)
+
+    # Mark any opponent pieces that are being attacked by the specified piece
+    piece.get_moves.each do |move|
+      opponent = get Board.to_alg(move)
+      if opponent != nil
+        opponent.attacked = true
+      end
+    end
+  end
+
+  def move_piece(piece, x1, y1, x2, y2)
+    @squares[x1][y1] = nil
+    @squares[x2][y2] = piece
+    piece.moved = true
+    piece.position = [x2, y2]
+
+    # If the king is castling, the rook needs to be moved also.
+    # This is the only instance where more than one piece of the
+    # same color moves in a single turn.
+    if piece.class == King && (x1-x2).abs > 1
+      row = (piece.side == :white) ? 0 : 7
+      if [x2, y2] == [6, row] # kingside castle
+        move_piece(@squares[7][row], 7, row, 5, row)
+      elsif [x2, y2] == [2, row] # queenside castle
+        move_piece(@squares[0][row], 0, row, 3, row)
+      end
+    end
+
+    update_attacks(piece)
+  end
+
   # Performs the specified move for the specified side if legal. Returns true
   # if successful; otherwise returns false.
-  def execute_move(move, side, testing=false)
+  def execute_move(move, side)
+    if side == :white
+      @white_king.check_castle if @white_king
+    else
+      @black_king.check_castle if @black_king
+    end
+
+    move(move, side)
+  end
+
+  def move(move, side, testing=false)
     message = nil
     status = false
 
@@ -67,11 +117,10 @@ class Board
       message = "There is no piece at #{move[0]}#{move[1]}. Try again."
     elsif piece.side == side
       x2, y2 = Board.to_xy(move[2..3])
-      # need to check if this is a legal move
-      if piece.get_moves.include?([x2,y2])
 
+      if piece.get_moves.include?([x2,y2])
         if piece.class == King && !testing && test_move([x2,y2], piece)
-          message = "You cannot move your King into check. Try again."
+          message = "You cannot move your king into check. Try again."
         else
           target_piece = @squares[x2][y2]
 
@@ -83,10 +132,7 @@ class Board
           end
 
           # Update the state of the board and the piece that moved.
-          @squares[x1][y1] = nil
-          @squares[x2][y2] = piece
-          piece.moved = true
-          piece.position = [x2, y2]
+          move_piece(piece, x1, y1, x2, y2)
           status = true
         end
       else
@@ -154,28 +200,33 @@ class Board
 
   # Returns true if the square at the specified position and for the specified
   # side is under attack by any opponent piece on this board.
-  def attacked?(piece)
-    attacked = false
+  def attacked?(position, side)
+    status = false
+
+    if position.class == String
+      position = Board.to_xy(position)
+    end
 
     (0..7).each do |x|
       (0..7).each do |y|
-        p = @squares[x][y]
-        next if p == nil || p.side == piece.side
+        next if [x, y] == position # The position can't attack itself
+        piece = @squares[x][y]
+        next if piece == nil || piece.side == side # only attacked by opponent
 
-        if p.get_moves.include?(piece.position)
-          attacked = true
+        if piece.get_moves.include?(position)
+          status = true
           break
         end
       end
-      break if attacked
+      break if status
     end
-    attacked
+    status
   end
 
   # Determines whether the king for the specified side is in check.
   def in_check?(side)
     king = (side == :white) ? @white_king : @black_king
-    attacked?(king)
+    king.attacked
   end
 
   # Executes the move of the specified piece on a separate (and identical)
@@ -186,7 +237,7 @@ class Board
     board = self.copy
     start = Board.to_alg(piece.position)
     finish = Board.to_alg(move)
-    board.execute_move("#{start}#{finish}", piece.side, true)
+    board.move("#{start}#{finish}", piece.side, true)
     board.in_check?(piece.side)
   end
 

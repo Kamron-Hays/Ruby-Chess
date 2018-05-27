@@ -1,5 +1,5 @@
 class Piece
-  attr_accessor :name, :position, :side, :rules, :moved
+  attr_accessor :name, :position, :side, :moved, :attacked
 
   # Creates a new chess piece.
   # square is an agebraic board coordinate (e.g. c2)
@@ -11,7 +11,11 @@ class Piece
     @board = board
     @board.add(self)
     @moved = false
-    @rules = [] # Rules that govern relative movement for this piece.
+    @board.update_attacks(self)
+  end
+
+  # Returns a list of rules that govern relative movement for this piece.
+  def get_rules
   end
 
   def get_moves
@@ -32,7 +36,6 @@ class Piece
   end
 
   def inspect
-    color = (side == :white) ? "White" : "Black"
-    "#{color} #{name} (#{position[0]},#{position[1]})"
+    "#{side} #{name} @#{Board.to_alg(position)}"
   end
 end

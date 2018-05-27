@@ -3,7 +3,7 @@ require_relative "stepping_piece"
 class Pawn < SteppingPiece
   def initialize(square, side, board)
     super(square, side, board)
-    @name = "Pawn"
+    @name = "pawn"
   end
 
   def get_moves

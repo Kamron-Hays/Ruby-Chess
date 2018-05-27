@@ -4,7 +4,7 @@ class SlidingPiece < Piece
   def get_moves
     moves = []
 
-    @rules.each do |rule|
+    get_rules.each do |rule|
       x,y = @position
 
       loop do
