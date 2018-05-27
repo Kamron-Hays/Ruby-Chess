@@ -18,7 +18,7 @@ describe Board do
       piece = Pawn.new("b1", :black, subject)
       status, message = subject.execute_move("b1b2", :white)
       expect(status).to be false
-      expect(message).to eql "The Pawn at b1 is not yours. Try again."
+      expect(message).to eql "The pawn at b1 is not yours. Try again."
     end
 
     it "Can't move to friendly occupied square" do
@@ -26,7 +26,7 @@ describe Board do
       piece2 = Knight.new("b2", :white, subject)
       status, message = subject.execute_move("b1b2", :white)
       expect(status).to be false
-      expect(message).to eql "The Pawn at b1 cannot legally move to b2. Try again."
+      expect(message).to eql "The pawn at b1 cannot legally move to b2. Try again."
     end
 
     it "Handles invalid movement commands" do
@@ -66,7 +66,7 @@ describe Board do
         expect(subject.get("b3")).to be piece
         status, message = subject.execute_move("b3b5", :white)
         expect(status).to be false
-        expect(message).to eql "The Pawn at b3 cannot legally move to b5. Try again."
+        expect(message).to eql "The pawn at b3 cannot legally move to b5. Try again."
         expect(subject.get("b5")).to be nil
         expect(subject.get("b3")).to be piece
         piece = Pawn.new("g7", :black, subject)
@@ -80,25 +80,25 @@ describe Board do
         piece = Pawn.new("b2", :white, subject)
         status, message = subject.execute_move("b2b1", :white)
         expect(status).to be false
-        expect(message).to eql "The Pawn at b2 cannot legally move to b1. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to b1. Try again."
         status, message = subject.execute_move("b2a1", :white)
         expect(status).to be false
-        expect(message).to eql "The Pawn at b2 cannot legally move to a1. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to a1. Try again."
         status, message = subject.execute_move("b2a2", :white)
         expect(status).to be false
-        expect(message).to eql "The Pawn at b2 cannot legally move to a2. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to a2. Try again."
         status, message = subject.execute_move("b2c1", :white)
         expect(status).to be false
-        expect(message).to eql "The Pawn at b2 cannot legally move to c1. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to c1. Try again."
         status, message = subject.execute_move("b2c2", :white)
         expect(status).to be false
-        expect(message).to eql "The Pawn at b2 cannot legally move to c2. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to c2. Try again."
         status, message = subject.execute_move("b2c3", :white)
         expect(status).to be false
-        expect(message).to eql "The Pawn at b2 cannot legally move to c3. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to c3. Try again."
         status, message = subject.execute_move("b2a3", :white)
         expect(status).to be false
-        expect(message).to eql "The Pawn at b2 cannot legally move to a3. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to a3. Try again."
         expect(subject.get("b2")).to be piece
       end
 
@@ -402,7 +402,145 @@ describe Board do
         Queen.new("f3", :black, subject)
         status, message = subject.execute_move("e1e2", :white)
         expect(status).to be false
-        expect(message).to eql "You cannot move your King into check. Try again."
+        expect(message).to eql "You cannot move your king into check. Try again."
+      end
+
+      it "Can castle kingside" do
+        wking = King.new("e1", :white, subject)
+        wrook = Rook.new("h1", :white, subject)
+        Pawn.new("e2", :white, subject)
+        Pawn.new("f2", :white, subject)
+        Pawn.new("g2", :white, subject)
+        Pawn.new("h2", :white, subject)
+        bking = King.new("e8", :black, subject)
+        brook = Rook.new("h8", :black, subject)
+        Pawn.new("e7", :black, subject)
+        Pawn.new("f7", :black, subject)
+        Pawn.new("g7", :black, subject)
+        Pawn.new("h7", :black, subject)
+        status, message = subject.execute_move("e1g1", :white)
+        expect(status).to be true
+        expect(subject.get("g1")).to be wking
+        expect(subject.get("f1")).to be wrook
+        expect(subject.get("e1")).to be nil
+        expect(subject.get("h1")).to be nil
+        status, message = subject.execute_move("e8g8", :black)
+        expect(status).to be true
+        expect(subject.get("g8")).to be bking
+        expect(subject.get("f8")).to be brook
+        expect(subject.get("e8")).to be nil
+        expect(subject.get("h8")).to be nil
+      end
+
+      it "Can castle queenside" do
+        wking = King.new("e1", :white, subject)
+        wrook = Rook.new("a1", :white, subject)
+        Pawn.new("a2", :white, subject)
+        Pawn.new("b2", :white, subject)
+        Pawn.new("c2", :white, subject)
+        Pawn.new("d2", :white, subject)
+        Pawn.new("e2", :white, subject)
+        bking = King.new("e8", :black, subject)
+        brook = Rook.new("a8", :black, subject)
+        Pawn.new("a7", :black, subject)
+        Pawn.new("b7", :black, subject)
+        Pawn.new("c7", :black, subject)
+        Pawn.new("d7", :black, subject)
+        Pawn.new("e7", :black, subject)
+        status, message = subject.execute_move("e1c1", :white)
+        expect(status).to be true
+        expect(subject.get("c1")).to be wking
+        expect(subject.get("d1")).to be wrook
+        expect(subject.get("e1")).to be nil
+        expect(subject.get("a1")).to be nil
+        status, message = subject.execute_move("e8c8", :black)
+        expect(status).to be true
+        expect(subject.get("c8")).to be bking
+        expect(subject.get("d8")).to be brook
+        expect(subject.get("e8")).to be nil
+        expect(subject.get("a8")).to be nil
+      end
+
+      it "Can't castle if the king has already moved" do
+        King.new("e1", :white, subject)
+        Rook.new("a1", :white, subject)
+        Rook.new("h1", :white, subject)
+        subject.execute_move("e1e2", :white)
+        subject.execute_move("e2e1", :white)
+        status, message = subject.execute_move("e1c1", :white)
+        expect(status).to be false
+        status, message = subject.execute_move("e1g1", :white)
+        expect(status).to be false
+      end
+
+      it "Can't castle if the rook has already moved" do
+        King.new("e1", :white, subject)
+        Rook.new("a1", :white, subject)
+        Rook.new("h1", :white, subject)
+        subject.execute_move("a1a2", :white)
+        subject.execute_move("a2a1", :white)
+        subject.execute_move("h1h2", :white)
+        subject.execute_move("h2h1", :white)
+        status, message = subject.execute_move("e1c1", :white)
+        expect(status).to be false
+        status, message = subject.execute_move("e1g1", :white)
+        expect(status).to be false
+      end
+
+      it "Can't castle if in check" do
+        King.new("e1", :white, subject)
+        Rook.new("a1", :white, subject)
+        Rook.new("h1", :white, subject)
+        Knight.new("d3", :black, subject)
+        status, message = subject.execute_move("e1c1", :white)
+        expect(status).to be false
+        status, message = subject.execute_move("e1g1", :white)
+        expect(status).to be false
+      end
+
+      it "Can't castle if moves through check" do
+        King.new("e1", :white, subject)
+        Rook.new("a1", :white, subject)
+        Rook.new("h1", :white, subject)
+        Rook.new("f3", :black, subject)
+        Rook.new("d3", :black, subject)
+        status, message = subject.execute_move("e1c1", :white)
+        expect(status).to be false
+        status, message = subject.execute_move("e1g1", :white)
+        expect(status).to be false
+      end
+
+      it "Can't castle if ends in check" do
+        King.new("e1", :white, subject)
+        Rook.new("a1", :white, subject)
+        Rook.new("h1", :white, subject)
+        Bishop.new("e3", :black, subject)
+        status, message = subject.execute_move("e1c1", :white)
+        expect(status).to be false
+        status, message = subject.execute_move("e1g1", :white)
+        expect(status).to be false
+      end
+
+      it "Can't castle if a piece is in the way" do
+        King.new("e1", :white, subject)
+        Rook.new("a1", :white, subject)
+        Rook.new("h1", :white, subject)
+        Bishop.new("b1", :white, subject)
+        Pawn.new("g1", :black, subject)
+        status, message = subject.execute_move("e1c1", :white)
+        expect(status).to be false
+        status, message = subject.execute_move("e1g1", :white)
+        expect(status).to be false
+      end
+
+      it "Can't castle with opponent's rook" do
+        King.new("e1", :white, subject)
+        Rook.new("a1", :black, subject)
+        Rook.new("h1", :black, subject)
+        status, message = subject.execute_move("e1c1", :white)
+        expect(status).to be false
+        status, message = subject.execute_move("e1g1", :white)
+        expect(status).to be false
       end
     end
   end
