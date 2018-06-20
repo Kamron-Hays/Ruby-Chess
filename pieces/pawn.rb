@@ -1,9 +1,12 @@
 require_relative "stepping_piece"
 
 class Pawn < SteppingPiece
+  attr_accessor :en_passant
+
   def initialize(square, side, board)
     super(square, side, board)
     @name = "pawn"
+    @en_passant = false
   end
 
   def get_moves
@@ -35,6 +38,19 @@ class Pawn < SteppingPiece
     if @board.in_bounds?(x+1, y1)
       piece2 = @board.squares[x+1][y1]
       moves << piece2.position if piece2 && (piece2.side != @side)
+    end
+
+    # If there is an opponent's pawn on the same row as this piece,
+    # and if that pawn has been marked as eligible for en passant
+    # capture, add it to the list of valid moves.
+    if @board.in_bounds?(x-1, y)
+      piece1 = @board.squares[x-1][y]
+      moves << [x-1,y1] if piece1 && (piece1.side != @side) && piece1.class == Pawn && piece1.en_passant
+    end
+
+    if @board.in_bounds?(x+1, y)
+      piece2 = @board.squares[x+1][y]
+      moves << [x+1,y1] if piece2 && (piece2.side != @side) && piece2.class == Pawn && piece2.en_passant
     end
 
     #moves.each { |move| print "#{@board.to_alg(move)} " }

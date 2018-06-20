@@ -53,6 +53,17 @@ class Board
     board
   end
 
+  # The en passant capture must be made immediately after the opponent pawn moves.
+  def reset_en_passant(side)
+    (0..7).each do |x|
+      (0..7).each do |y|
+        piece = @squares[x][y]
+        next if piece == nil || piece.side != side || piece.class != Pawn
+        piece.en_passant = false
+      end
+    end
+  end
+
   # Updates the "attacked" status for the specified piece, as well as any
   # pieces under attack by the specified piece.
   def update_attacks(piece)
@@ -68,9 +79,24 @@ class Board
   end
 
   def move_piece(piece, x1, y1, x2, y2)
+    target_piece = @squares[x2][y2]
+
+    # If this piece is a pawn moving diagonally to an empty square, it must be
+    # an en passant move. Remove the opponent's pawn from the board.
+    if piece.class == Pawn && x2 != x1 && target_piece == nil
+      target_piece = @squares[x2][y1]
+    end
+
+    if target_piece != nil
+      # There is a piece at this square - it's now captured.
+      captured = (target_piece.side == :black) ? @black_captured : @white_captured
+      captured << target_piece
+      x, y = target_piece.position
+      @squares[x][y] = nil
+    end
+
     @squares[x1][y1] = nil
     @squares[x2][y2] = piece
-    piece.moved = true
     piece.position = [x2, y2]
 
     # If the king is castling, the rook needs to be moved also.
@@ -84,6 +110,20 @@ class Board
         move_piece(@squares[0][row], 0, row, 3, row)
       end
     end
+
+    if piece.class == Pawn
+      # If this is a pawn moving two spaces on its first move,
+      # mark it as eligible for en passant capture.
+      if !piece.moved && (y1-y2).abs > 1
+        piece.en_passant = true
+      end
+    end
+
+    piece.moved = true
+
+    # Once a side moves, any opponent pawn marked as eligible for en passant
+    # capture is no longer eligible.
+    reset_en_passant((piece.side == :white) ? :black : :white)
 
     update_attacks(piece)
   end
@@ -122,15 +162,6 @@ class Board
         if piece.class == King && !testing && test_move([x2,y2], piece)
           message = "You cannot move your king into check. Try again."
         else
-          target_piece = @squares[x2][y2]
-
-          if target_piece != nil
-            # There is a piece at this square - it's now captured.
-            captured = (side == :white) ? @black_captured : @white_captured
-            captured << target_piece
-            @squares[x2][y2] = nil
-          end
-
           # Update the state of the board and the piece that moved.
           move_piece(piece, x1, y1, x2, y2)
           status = true
