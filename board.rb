@@ -70,6 +70,7 @@ class Board
     piece.attacked = attacked?(piece.position, piece.side)
 
     # Mark any opponent pieces that are being attacked by the specified piece
+    moves = piece.get_moves
     piece.get_moves.each do |move|
       opponent = get Board.to_alg(move)
       if opponent != nil
@@ -79,6 +80,7 @@ class Board
   end
 
   def move_piece(piece, x1, y1, x2, y2)
+    rook = nil
     target_piece = @squares[x2][y2]
 
     # If this piece is a pawn moving diagonally to an empty square, it must be
@@ -105,10 +107,18 @@ class Board
     if piece.class == King && (x1-x2).abs > 1
       row = (piece.side == :white) ? 0 : 7
       if [x2, y2] == [6, row] # kingside castle
-        move_piece(@squares[7][row], 7, row, 5, row)
+        x3, x4 = 7, 5
+        piece.can_castle_kingside = false
       elsif [x2, y2] == [2, row] # queenside castle
-        move_piece(@squares[0][row], 0, row, 3, row)
+        x3, x4 = 0, 3
+        piece.can_castle_queenside = false
       end
+
+      rook = @squares[x3][row]
+      @squares[x3][row] = nil
+      @squares[x4][row] = rook
+      rook.position = [x4, row]
+      rook.moved = true
     end
 
     if piece.class == Pawn
@@ -124,8 +134,8 @@ class Board
     # Once a side moves, any opponent pawn marked as eligible for en passant
     # capture is no longer eligible.
     reset_en_passant((piece.side == :white) ? :black : :white)
-
     update_attacks(piece)
+    update_attacks(rook) if rook != nil
   end
 
   # Performs the specified move for the specified side if legal. Returns true
