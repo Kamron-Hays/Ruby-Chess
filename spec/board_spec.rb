@@ -638,4 +638,138 @@ describe Board do
       expect(subject.mate?(:white)).to be false
     end
   end
+
+  describe "General game play" do
+
+    it "Successfully completes game pattern #1" do
+      subject.setup
+      subject.execute_move("e2e3", :white)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("e7e6", :black)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("f1d3", :white)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("f8d6", :black)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("g1h3", :white)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("g8h6", :black)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("e1g1", :white)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("e8g8", :black)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+    end
+
+    it "Successfully completes game pattern #2" do
+      subject.setup
+      subject.execute_move("e2e4", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("c7c5", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("g1f3", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("b8b6", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("d2d4", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("c5d4", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      expect(subject.white_captured.size).to eq 1
+      subject.execute_move("f3d4", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      expect(subject.black_captured.size).to eq 1
+      subject.execute_move("g7g6", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("b1c3", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("f8g7", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("c1e3", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("g8f6", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("f1c4", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("e8g8", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("c4b3", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("c6a5", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("e4e5", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("f6e8", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("b3f7", :white)
+      expect(subject.in_check?(:black)).to be true
+      expect(subject.mate?(:black)).to be false
+      expect(subject.black_captured.size).to eq 2
+      subject.execute_move("g8f7", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      expect(subject.white_captured.size).to eq 2
+      subject.execute_move("d4e6", :white)
+      expect(subject.in_check?(:black)).to be false
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("f7e6", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      expect(subject.white_captured.size).to eq 3
+      subject.execute_move("d1d5", :white)
+      expect(subject.in_check?(:black)).to be true
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("e6f5", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("g2g4", :white)
+      expect(subject.in_check?(:black)).to be true
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("f5g4", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      expect(subject.white_captured.size).to eq 4
+      subject.execute_move("h1g1", :white)
+      expect(subject.in_check?(:black)).to be true
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("g4h3", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("d5g2", :white)
+      expect(subject.in_check?(:black)).to be true
+      expect(subject.mate?(:black)).to be false
+      subject.execute_move("h3h4", :black)
+      expect(subject.in_check?(:white)).to be false
+      expect(subject.mate?(:white)).to be false
+      subject.execute_move("g2g4", :white)
+      expect(subject.in_check?(:black)).to be true
+      expect(subject.mate?(:black)).to be true
+    end
+  end
 end
