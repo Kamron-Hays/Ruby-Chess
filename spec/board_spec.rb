@@ -126,7 +126,24 @@ describe Board do
         status, message = subject.execute_move("h6h4", :black)
       end
 
-      # Test en passant capture here
+      it "Can capture en passant" do
+        Pawn.new("d2", :white, subject)
+        piece1 = Pawn.new("c4", :black, subject)
+        Pawn.new("e7", :black, subject)
+        piece2 = Pawn.new("d5", :white, subject)
+        status, message = subject.execute_move("d2d4", :white)
+        expect(status).to be true
+        status, message = subject.execute_move("c4d3", :black)
+        expect(status).to be true
+        expect(subject.get("d3")).to be piece1
+        expect(subject.get("d4")).to be nil
+        status, message = subject.execute_move("e7e5", :black)
+        expect(status).to be true
+        status, message = subject.execute_move("d5e6", :white)
+        expect(status).to be true
+        expect(subject.get("e6")).to be piece2
+        expect(subject.get("e5")).to be nil
+      end
     end
 
     #########################
