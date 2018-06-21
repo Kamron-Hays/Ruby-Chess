@@ -8,6 +8,7 @@ class King < SteppingPiece
   def initialize(square, side, board)
     super(square, side, board)
     @name = "king"
+    @value = 100
   end
 
   # Determines whether this king can castle.

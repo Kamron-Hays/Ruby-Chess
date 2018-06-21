@@ -7,6 +7,7 @@ class Knight < SteppingPiece
   def initialize(square, side, board)
     super(square, side, board)
     @name = "knight"
+    @value = 3
   end
 
   def get_rules

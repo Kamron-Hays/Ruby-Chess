@@ -211,7 +211,15 @@ class Board
   end
 
   def draw
-    puts "\n#{COL}\n#{DIV}\n"
+    @white_captured.sort!
+    @black_captured.sort!
+    puts
+    if @white_captured.size > 0
+      print "   "
+      @white_captured.each { |piece| print "#{piece} " }
+      print "\n"
+    end
+    puts "#{COL}\n#{DIV}\n"
 
     7.downto(0) do |y|
       row = " #{y+1} "
@@ -220,7 +228,13 @@ class Board
       puts "#{row}\n#{DIV}\n"
     end
 
-    puts "#{COL}\n\n"
+    puts "#{COL}\n"
+    if @black_captured.size > 0
+      print "   "
+      @black_captured.each { |piece| print "#{piece} " }
+      print "\n"
+    end
+    puts
   end
 
   def add(piece)
@@ -234,7 +248,7 @@ class Board
       end
     end
   end
-
+  
   def valid_move?(move)
     move.match(/[a-h][1-8][a-h][1-8]/)
   end

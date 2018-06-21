@@ -1,5 +1,5 @@
 class Piece
-  attr_accessor :name, :position, :side, :moved, :attacked
+  attr_accessor :name, :position, :side, :moved, :attacked, :value
 
   # Creates a new chess piece.
   # square is an agebraic board coordinate (e.g. c2)
@@ -37,5 +37,9 @@ class Piece
 
   def inspect
     "#{side} #{name} @#{Board.to_alg(position)}"
+  end
+
+  def <=>(other)
+    @value <=> other.value
   end
 end

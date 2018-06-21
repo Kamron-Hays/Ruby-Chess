@@ -7,6 +7,7 @@ class Bishop < SlidingPiece
   def initialize(square, side, board)
     super(square, side, board)
     @name = "bishop"
+    @value = 3
   end
 
   def get_rules

@@ -7,6 +7,7 @@ class Pawn < SteppingPiece
     super(square, side, board)
     @name = "pawn"
     @en_passant = false
+    @value = 1
   end
 
   def get_moves

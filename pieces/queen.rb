@@ -7,6 +7,7 @@ class Queen < SlidingPiece
   def initialize(square, side, board)
     super(square, side, board)
     @name = "queen"
+    @value = 9
   end
 
   def get_rules

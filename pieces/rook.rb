@@ -7,6 +7,7 @@ class Rook < SlidingPiece
   def initialize(square, side, board)
     super(square, side, board)
     @name = "rook"
+    @value = 5
   end
 
   def get_rules
