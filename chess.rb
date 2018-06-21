@@ -50,7 +50,7 @@ class Chess
       display_help
     elsif @board.valid_move?(input)
       success, message = @board.execute_move(input, @side)
-      puts message if message
+      puts "#{message} Try again." if message
       if success
         @side = (@side == :white) ? :black : :white
       else

@@ -64,21 +64,6 @@ class Board
     end
   end
 
-  # Updates the "attacked" status for the specified piece, as well as any
-  # pieces under attack by the specified piece.
-  def update_attacks(piece)
-    piece.attacked = attacked?(piece.position, piece.side)
-
-    # Mark any opponent pieces that are being attacked by the specified piece
-    moves = piece.get_moves
-    piece.get_moves.each do |move|
-      opponent = get Board.to_alg(move)
-      if opponent != nil
-        opponent.attacked = true
-      end
-    end
-  end
-
   def move_piece(piece, x1, y1, x2, y2)
     rook = nil
     target_piece = @squares[x2][y2]
@@ -134,8 +119,6 @@ class Board
     # Once a side moves, any opponent pawn marked as eligible for en passant
     # capture is no longer eligible.
     reset_en_passant((piece.side == :white) ? :black : :white)
-    update_attacks(piece)
-    update_attacks(rook) if rook != nil
   end
 
   # Performs the specified move for the specified side if legal. Returns true
@@ -164,23 +147,25 @@ class Board
     piece = @squares[x1][y1]
 
     if !piece
-      message = "There is no piece at #{move[0]}#{move[1]}. Try again."
+      message = "There is no piece at #{move[0]}#{move[1]}."
     elsif piece.side == side
       x2, y2 = Board.to_xy(move[2..3])
 
       if piece.get_moves.include?([x2,y2])
-        if piece.class == King && !testing && test_move([x2,y2], piece)
-          message = "You cannot move your king into check. Try again."
+        if !testing && in_check?(side) && test_move([x2,y2], piece)
+          message = "You must move out of check."
+        elsif !testing && piece.class == King && test_move([x2,y2], piece)
+          message = "You cannot move your king into check."
         else
           # Update the state of the board and the piece that moved.
           move_piece(piece, x1, y1, x2, y2)
           status = true
         end
       else
-        message = "The #{piece.name} at #{move[0]}#{move[1]} cannot legally move to #{move[2]}#{move[3]}. Try again."
+        message = "The #{piece.name} at #{move[0]}#{move[1]} cannot legally move to #{move[2]}#{move[3]}."
       end
     else
-      message = "The #{piece.name} at #{move[0]}#{move[1]} is not yours. Try again."
+      message = "The #{piece.name} at #{move[0]}#{move[1]} is not yours."
     end
     [status, message]
   end
@@ -258,6 +243,7 @@ class Board
   def attacked?(position, side)
     status = false
 
+    # Convert from algebraic to xy coordinates
     if position.class == String
       position = Board.to_xy(position)
     end
@@ -278,10 +264,10 @@ class Board
     status
   end
 
-  # Determines whether the king for the specified side is in check.
+  # Determines whether the king (if it exists) for the specified side is in check.
   def in_check?(side)
     king = (side == :white) ? @white_king : @black_king
-    king.attacked
+    king.attacked? if king
   end
 
   # Executes the move of the specified piece on a separate (and identical)

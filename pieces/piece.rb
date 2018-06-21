@@ -8,10 +8,9 @@ class Piece
   def initialize(square, side, board)
     @position = Board.to_xy(square)
     @side = side
+    @moved = false
     @board = board
     @board.add(self)
-    @moved = false
-    @board.update_attacks(self)
   end
 
   # Returns a list of rules that govern relative movement for this piece.
@@ -33,6 +32,10 @@ class Piece
       end
     end
     status
+  end
+
+  def attacked?
+    @board.attacked?(@position, @side)
   end
 
   def inspect
