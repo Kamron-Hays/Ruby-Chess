@@ -11,14 +11,14 @@ describe Board do
     it "Can't move a non-existent piece" do
       status, message = subject.execute_move("b1b2", :white)
       expect(status).to be false
-      expect(message).to eql "There is no piece at b1. Try again."
+      expect(message).to eql "There is no piece at b1."
     end
 
     it "Can't move opponent's piece" do
       piece = Pawn.new("b1", :black, subject)
       status, message = subject.execute_move("b1b2", :white)
       expect(status).to be false
-      expect(message).to eql "The pawn at b1 is not yours. Try again."
+      expect(message).to eql "The pawn at b1 is not yours."
     end
 
     it "Can't move to friendly occupied square" do
@@ -26,7 +26,7 @@ describe Board do
       piece2 = Knight.new("b2", :white, subject)
       status, message = subject.execute_move("b1b2", :white)
       expect(status).to be false
-      expect(message).to eql "The pawn at b1 cannot legally move to b2. Try again."
+      expect(message).to eql "The pawn at b1 cannot legally move to b2."
     end
 
     it "Handles invalid movement commands" do
@@ -66,7 +66,7 @@ describe Board do
         expect(subject.get("b3")).to be piece
         status, message = subject.execute_move("b3b5", :white)
         expect(status).to be false
-        expect(message).to eql "The pawn at b3 cannot legally move to b5. Try again."
+        expect(message).to eql "The pawn at b3 cannot legally move to b5."
         expect(subject.get("b5")).to be nil
         expect(subject.get("b3")).to be piece
         piece = Pawn.new("g7", :black, subject)
@@ -80,25 +80,25 @@ describe Board do
         piece = Pawn.new("b2", :white, subject)
         status, message = subject.execute_move("b2b1", :white)
         expect(status).to be false
-        expect(message).to eql "The pawn at b2 cannot legally move to b1. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to b1."
         status, message = subject.execute_move("b2a1", :white)
         expect(status).to be false
-        expect(message).to eql "The pawn at b2 cannot legally move to a1. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to a1."
         status, message = subject.execute_move("b2a2", :white)
         expect(status).to be false
-        expect(message).to eql "The pawn at b2 cannot legally move to a2. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to a2."
         status, message = subject.execute_move("b2c1", :white)
         expect(status).to be false
-        expect(message).to eql "The pawn at b2 cannot legally move to c1. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to c1."
         status, message = subject.execute_move("b2c2", :white)
         expect(status).to be false
-        expect(message).to eql "The pawn at b2 cannot legally move to c2. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to c2."
         status, message = subject.execute_move("b2c3", :white)
         expect(status).to be false
-        expect(message).to eql "The pawn at b2 cannot legally move to c3. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to c3."
         status, message = subject.execute_move("b2a3", :white)
         expect(status).to be false
-        expect(message).to eql "The pawn at b2 cannot legally move to a3. Try again."
+        expect(message).to eql "The pawn at b2 cannot legally move to a3."
         expect(subject.get("b2")).to be piece
       end
 
@@ -419,7 +419,7 @@ describe Board do
         Queen.new("f3", :black, subject)
         status, message = subject.execute_move("e1e2", :white)
         expect(status).to be false
-        expect(message).to eql "You cannot move your king into check. Try again."
+        expect(message).to eql "You cannot move your king into check."
       end
 
       it "Can castle kingside" do
@@ -563,6 +563,44 @@ describe Board do
   end
 
   describe "#in_check?(side) and #mate?(side)" do
+
+    it "Must move out of check if possible case #1" do
+      King.new("e1", :white, subject)
+      Knight.new("d3", :white, subject)
+      Queen.new("f2", :black, subject)
+      expect(subject.in_check?(:white)).to be true
+      status, message = subject.execute_move("d3e5", :white)
+      expect(status).to be false
+      expect(message).to eql "You must move out of check."
+      # King moves away from check
+      status, message = subject.execute_move("e1d1", :white)
+      expect(status).to be true
+    end
+
+    it "Must move out of check if possible case #2" do
+      King.new("e1", :white, subject)
+      Knight.new("d3", :white, subject)
+      Queen.new("f2", :black, subject)
+      expect(subject.in_check?(:white)).to be true
+      # King captures the piece that placed it in check
+      status, message = subject.execute_move("e1f2", :white)
+      expect(status).to be true
+    end
+
+    it "Must move out of check if possible case #3" do
+      King.new("e1", :white, subject)
+      Knight.new("d3", :white, subject)
+      Queen.new("f2", :black, subject)
+      expect(subject.in_check?(:white)).to be true
+      # The King moves, but is still in check
+      status, message = subject.execute_move("e1e2", :white)
+      expect(status).to be false
+      expect(message).to eql "You must move out of check."
+      # Another piece captures the piece that placed the king in check
+      status, message = subject.execute_move("d3f2", :white)
+      expect(status).to be true
+      expect(message).to be nil
+    end
 
     it "Properly detects Fool's Mate" do
       subject.setup
