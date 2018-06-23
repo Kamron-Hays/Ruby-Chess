@@ -3,8 +3,11 @@
 require_relative "player"
 require_relative "board"
 require 'yaml'
+require 'fileutils'
 
 class Chess
+
+  @@SAVE_DIR = "./.chess"
 
   def initialize
     @side = nil
@@ -14,6 +17,17 @@ class Chess
     @done = false
     @game_over = false
     @skip_board_draw = false
+    @saved_games = []
+
+    if File.exist?(@@SAVE_DIR)
+      Dir.entries(@@SAVE_DIR).each do |entry|
+        m = entry.match(/\.([a-zA-Z_0-9]+)\.yml/)
+        if m && m.size == 2
+          @saved_games << m[1]
+        end
+      end
+    end
+    @saved_games.sort!
   end
 
   def display_board
@@ -38,9 +52,9 @@ class Chess
     input = (@side == :white) ? @white.get_input : @black.get_input
 
     if input == "load"
-      puts "load game"
+      do_load
     elsif input == "save"
-      puts "save game"
+      do_save
     elsif input == "exit" || input == "quit"
       @done = true
     elsif input == "resign"
@@ -63,12 +77,50 @@ class Chess
   end
 
   def get_yes_or_no(prompt)
-    status = false
     print prompt
     response = gets.chomp.downcase
     response == 'y' || response == 'ye' || response == 'yes'
   end
-  
+
+  def do_load
+    puts "Saved games:"
+    @saved_games.each { |name| puts name }
+    print "Enter name of game to load: "
+    name = gets.chomp
+    if @saved_games.include?(name)
+      file_name = @@SAVE_DIR + "/.#{name}.yml"
+      @side, @white, @black, @board, @done, @game_over, @skip_board_draw = YAML.load( File.open(file_name, 'r') )
+    else
+      puts "Game #{name} not found."
+    end
+  end
+
+  def do_save
+    name = ""
+    loop do
+      print "Enter name of game to save: "
+      name = gets.chomp
+      break if name[/[a-zA-Z_0-9]+/] == name
+      puts "Invalid filename. Use only letters, numbers, and underscore."
+    end
+
+    FileUtils.mkdir(@@SAVE_DIR) unless File.exist?(@@SAVE_DIR) 
+    file_name = @@SAVE_DIR + "/.#{name}.yml"
+
+    if !@saved_games.include?(name) || get_yes_or_no("Overwrite save game '#{name}'?")
+      # Save the game
+      File.open(file_name, 'w') do |file|
+        file.puts YAML.dump([@side, @white, @black, @board, @done, @game_over, @skip_board_draw])
+      end
+
+      @saved_games << name
+      @saved_games.sort!
+      puts "Saved game #{name}."
+    else
+      puts "Game not saved."
+    end
+  end
+
   def play
     loop do
       @board = Board.new
