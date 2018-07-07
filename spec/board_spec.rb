@@ -810,4 +810,50 @@ describe Board do
       expect(subject.mate?(:black)).to be true
     end
   end
+
+  describe "#promote? and #promote(pawn, new_piece)" do
+
+    it "Properly detects when a pawn should be promoted" do
+      subject.setup
+      w_queen = Queen.new(nil, :white, nil)
+      b_rook = Rook.new(nil, :black, nil)
+      subject.execute_move("d2d4", :white)
+      expect(subject.promote?).to be nil
+      subject.execute_move("c7c5", :black)
+      expect(subject.promote?).to be nil
+      subject.execute_move("d4c5", :white)
+      expect(subject.promote?).to be nil
+      subject.execute_move("b7b5", :black)
+      expect(subject.promote?).to be nil
+      subject.execute_move("c5c6", :white)
+      expect(subject.promote?).to be nil
+      subject.execute_move("c8b7", :black)
+      expect(subject.promote?).to be nil
+      subject.execute_move("c6c7", :white)
+      expect(subject.promote?).to be nil
+      subject.execute_move("b5b4", :black)
+      expect(subject.promote?).to be nil
+      subject.execute_move("c7c8", :white)
+      pawn = subject.promote?
+      expect(pawn.class).to be Pawn
+      expect(pawn.side).to be :white
+      expect(subject.promote(pawn, w_queen)).to be true
+      subject.execute_move("b4b3", :black)
+      expect(subject.promote?).to be nil
+      subject.execute_move("c1d2", :white)
+      expect(subject.promote?).to be nil
+      subject.execute_move("b3c2", :black)
+      expect(subject.promote?).to be nil
+      subject.execute_move("d2e3", :white)
+      expect(subject.promote?).to be nil
+      subject.execute_move("c2c1", :black)
+      pawn = subject.promote?
+      expect(pawn.class).to be Pawn
+      expect(pawn.side).to be :black
+      expect(subject.promote(pawn, w_queen)).to be false
+      expect(subject.promote(pawn, nil)).to be false
+      expect(subject.promote(pawn, pawn)).to be false
+      expect(subject.promote(pawn, b_rook)).to be true
+    end
+  end
 end
