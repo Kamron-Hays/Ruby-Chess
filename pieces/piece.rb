@@ -1,16 +1,16 @@
 class Piece
-  attr_accessor :name, :position, :side, :moved, :attacked, :value
+  attr_accessor :name, :position, :side, :board, :moved, :attacked, :value
 
   # Creates a new chess piece.
   # square is an agebraic board coordinate (e.g. c2)
   # size should be either :white or :black
   # board is the Board where the piece will be placed
   def initialize(square, side, board)
-    @position = Board.to_xy(square)
+    @position = Board.to_xy(square) if square
     @side = side
     @moved = false
     @board = board
-    @board.add(self)
+    @board.add(self) if board
   end
 
   # Returns a list of rules that govern relative movement for this piece.

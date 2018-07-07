@@ -139,6 +139,14 @@ class Chess
       loop do
         display_board
 
+        # Check if a pawn needs to be promoted
+        piece = @board.promote?
+        if piece != nil
+          new_piece = (@side == :white) ? @white.promote(piece) : @black.promote(piece)
+          @board.promote(piece, new_piece)
+          display_board
+        end
+
         if @board.in_check?(@side)
           if @board.mate?(@side)
             opponent = (@side == :white) ? "Black" : "White"

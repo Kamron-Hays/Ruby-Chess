@@ -312,4 +312,36 @@ class Board
     end
     status
   end
+
+  # Check if there is a pawn eligible for promotion. If so, return the pawn.
+  # Otherwise, return nil.
+  def promote?
+    piece = nil
+    (0..7).each do |x|
+      [0, 7].each do |y|
+        p = @squares[x][y]
+        next if p == nil || p.class != Pawn
+        piece = p
+        break
+      end
+      break if piece
+    end
+    piece
+  end
+
+  # Replace the specified pawn with the specified piece.
+  def promote(pawn, new_piece)
+    status = false
+    if pawn != nil && pawn.class == Pawn && new_piece != nil && pawn.side == new_piece.side &&
+       ( (pawn.side == :white && pawn.position[1] == 7) || (pawn.side == :black && pawn.position[1] == 0) ) &&
+       ( new_piece.class == Queen || new_piece.class == Rook || new_piece.class == Bishop || new_piece.class == Knight )
+      new_piece.position = pawn.position
+      new_piece.side = pawn.side
+      new_piece.board = pawn.board
+      x, y = new_piece.position
+      @squares[x][y] = new_piece
+      status = true
+    end
+    status
+  end
 end
