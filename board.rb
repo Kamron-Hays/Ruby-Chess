@@ -152,9 +152,9 @@ class Board
       x2, y2 = Board.to_xy(move[2..3])
 
       if piece.get_moves.include?([x2,y2])
-        if !testing && in_check?(side) && test_move([x2,y2], piece)
+        if !testing && in_check?(side) && test_check([x2,y2], piece)
           message = "You must move out of check."
-        elsif !testing && test_move([x2,y2], piece)
+        elsif !testing && test_check([x2,y2], piece)
           message = "You cannot move your king into check."
         else
           # Update the state of the board and the piece that moved.
@@ -188,10 +188,15 @@ class Board
     alg = "#{"abcdefgh"[move[0]]}#{move[1]+1}"
   end
 
-  # Returns the piece (if any) at the specified algebraic coordinate
-  # (e.g. c3). Returns nil if no piece is at the coordinate.
+  # Returns the piece (if any) at the specified x,y coordinate.
+  # Returns nil if no piece is at the coordinate.
   def get(coordinate)
     x,y = Board.to_xy(coordinate)
+    @squares[x][y]
+  end
+
+  def getxy(xy)
+    x,y = xy
     @squares[x][y]
   end
 
@@ -273,13 +278,21 @@ class Board
   # Executes the move of the specified piece on a separate (and identical)
   # board. Returns true if the associated king is in check after the move.
   # Otherwise, false is returned.
+  def test_check(move, piece)
+    board = test_move(move, piece)
+    board.in_check?(piece.side)
+  end
+
+  # Executes the move of the specified piece on a separate (and identical)
+  # board. Returns a score based on whether the king would be in check
+  # and/or whether the specified piece would be attacked after the move.
   def test_move(move, piece)
     # make a deep copy so original board state is maintained
     board = self.copy
     start = Board.to_alg(piece.position)
     finish = Board.to_alg(move)
     board.move("#{start}#{finish}", piece.side, true)
-    board.in_check?(piece.side)
+    board
   end
 
   # Determines if there are any moves for the specified side that result in
@@ -301,7 +314,7 @@ class Board
         next if piece == nil || piece.side != side
 
         piece.get_moves.each do |move|
-          if !test_move(move, piece)
+          if !test_check(move, piece)
             # found a move where the king is not in check, so no mate
             status = false
             break

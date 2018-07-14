@@ -3,12 +3,13 @@ require_relative "stepping_piece"
 class King < SteppingPiece
   attr_accessor :can_castle_kingside, :can_castle_queenside
 
+  @@VALUE = 100
   @@RULES = [[-1,0], [-1,1], [0,1], [1,1], [1,0], [1,-1], [0,-1], [-1,-1]]
 
   def initialize(square, side, board)
     super(square, side, board)
     @name = "king"
-    @value = 100
+    @value = @@VALUE
   end
 
   # Determines whether this king can castle.
@@ -41,6 +42,10 @@ class King < SteppingPiece
 
   def get_rules
     @@RULES
+  end
+
+  def self.get_value
+    @@VALUE
   end
 
   def get_moves

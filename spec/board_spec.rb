@@ -864,4 +864,25 @@ describe Board do
       expect(subject.promote(pawn, b_rook)).to be true
     end
   end
+
+  describe "#test_move" do
+
+    it "Properly detects a bad move #1" do
+      King.new("d5", :black, subject)
+      Bishop.new("e4", :black, subject)
+      king = King.new("e3", :white, subject)
+      board = subject.test_move([4,3], king)
+      expect(board.attacked?([4,3], :white)).to eq(true)
+      expect(board.in_check?(:white)).to eq(true)
+    end
+
+    it "Properly detects a bad move #2" do
+      King.new("c6", :black, subject)
+      queen = Queen.new("c5", :black, subject)
+      King.new("d2", :white, subject)
+      board = subject.test_move([4,2], queen)
+      expect(board.attacked?([4,2], :black)).to eq(true)
+      expect(board.in_check?(:black)).to eq(false)
+    end
+  end
 end

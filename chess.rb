@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require_relative "player"
+require_relative "ai_player"
 require_relative "board"
 require 'yaml'
 require 'fileutils'

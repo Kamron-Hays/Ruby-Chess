@@ -8,7 +8,7 @@ class Player
   def get_input
     print (@side == :white) ? "White's turn: " : "Black's turn: "
     # remove all whitespace and convert remaining characters to lower case
-    return gets.gsub(/\s+/, "").downcase
+    gets.gsub(/\s+/, "").downcase
   end
 
   # Since pawn promotion is required (i.e. not optional), there should only
@@ -44,7 +44,4 @@ class Player
 
     new_piece
   end
-end
-
-class AI_Player < Player
 end
