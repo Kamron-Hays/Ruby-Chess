@@ -77,9 +77,9 @@ class Chess
   end
 
   def get_yes_or_no(prompt)
-    print prompt
+    print prompt + " [Y/n] "
     response = gets.chomp.downcase
-    response == 'y' || response == 'ye' || response == 'yes'
+    response == '' || response == 'y' || response == 'ye' || response == 'yes'
   end
 
   def do_load
@@ -128,11 +128,11 @@ class Chess
       @resign = false
       @side = :white
 
-      answer = get_yes_or_no("Do you want White to be human? ")
-      @white = answer ? Player.new(:white) : AI_Player.new(:white)
+      answer = get_yes_or_no("Do you want White to be human?")
+      @white = answer ? Player.new(:white) : AI_Player.new(:white, @board)
 
-      answer = get_yes_or_no("Do you want Black to be human? ")
-      @black = answer ? Player.new(:black) : AI_Player.new(:black)
+      answer = get_yes_or_no("Do you want Black to be human?")
+      @black = answer ? Player.new(:black) : AI_Player.new(:black, @board)
 
       display_help
 
@@ -167,8 +167,9 @@ class Chess
       end
 
       break if @done
-      play_again = get_yes_or_no("\nPlay again? ")
+      play_again = get_yes_or_no("\nPlay again?")
       break if !play_again
+      @game_over = false
     end
   end
 end
