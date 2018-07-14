@@ -154,7 +154,7 @@ class Board
       if piece.get_moves.include?([x2,y2])
         if !testing && in_check?(side) && test_move([x2,y2], piece)
           message = "You must move out of check."
-        elsif !testing && piece.class == King && test_move([x2,y2], piece)
+        elsif !testing && test_move([x2,y2], piece)
           message = "You cannot move your king into check."
         else
           # Update the state of the board and the piece that moved.

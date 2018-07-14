@@ -41,6 +41,14 @@ describe Board do
       expect(status).to be false
     end
 
+    it "Cannot make a move that places one's king in check" do
+      King.new("e1", :white, subject)
+      Rook.new("e4", :white, subject)
+      Queen.new("e8", :black, subject)
+      status, message = subject.execute_move("e4f4", :white)
+      expect(status).to be false
+    end
+
     #######################
     # Test pawn movements #
     #######################
