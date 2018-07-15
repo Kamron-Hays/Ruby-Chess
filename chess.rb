@@ -12,6 +12,7 @@ class Chess
 
   def initialize
     @side = nil
+    @turn = nil
     @white = nil
     @black = nil
     @board = nil
@@ -50,7 +51,7 @@ class Chess
   end
 
   def process_input
-    input = (@side == :white) ? @white.get_input : @black.get_input
+    input = (@side == :white) ? @white.get_input(@turn) : @black.get_input(@turn)
 
     if input == "load"
       do_load
@@ -75,7 +76,12 @@ class Chess
           @board.promote(piece, new_piece)
         end
 
-        @side = (@side == :white) ? :black : :white
+        if @side == :white
+          @side = :black
+        else
+          @turn += 1
+          @side = :white
+        end
       else
         @skip_board_draw = true        
       end
@@ -98,7 +104,7 @@ class Chess
     name = gets.chomp
     if @saved_games.include?(name)
       file_name = @@SAVE_DIR + "/.#{name}.yml"
-      @side, @white, @black, @board, @done, @game_over, @skip_board_draw = YAML.load( File.open(file_name, 'r') )
+      @side, @turn, @white, @black, @board, @done, @game_over, @skip_board_draw = YAML.load( File.open(file_name, 'r') )
     else
       puts "Game #{name} not found."
     end
@@ -119,7 +125,7 @@ class Chess
     if !@saved_games.include?(name) || get_yes_or_no("Overwrite save game '#{name}'?")
       # Save the game
       File.open(file_name, 'w') do |file|
-        file.puts YAML.dump([@side, @white, @black, @board, @done, @game_over, @skip_board_draw])
+        file.puts YAML.dump([@side, @turn, @white, @black, @board, @done, @game_over, @skip_board_draw])
       end
 
       @saved_games << name
@@ -156,6 +162,7 @@ class Chess
       @board.setup
       @resign = false
       @side = :white
+      @turn = 1
 
       answer = get_yes_or_no("Do you want White to be human?")
       @white = answer ? Player.new(:white) : AI_Player.new(:white, @board)

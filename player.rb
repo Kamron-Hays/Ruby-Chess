@@ -5,8 +5,9 @@ class Player
     @side = side
   end
 
-  def get_input
-    print (@side == :white) ? "White's turn: " : "Black's turn: "
+  def get_input(turn)
+    side = (@side == :white) ? "White" : "Black"
+    print "[#{turn}] #{side}'s turn: "
     # remove all whitespace and convert remaining characters to lower case
     gets.gsub(/\s+/, "").downcase
   end
