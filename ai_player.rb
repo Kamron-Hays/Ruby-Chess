@@ -9,19 +9,10 @@ class AI_Player < Player
   def get_input
     # Score every possible move, then choose the move with the highest score.
     # If there are multiple moves with the same highest score, randomly choose
-    # one.
-    #
-    # Scoring is done as follows: If the player's piece associated with the
-    # move is under attack prior to the move, add the value of the piece. For
-    # the remainder of the scoring, a single-move look-ahead is performed. If
-    # the move will result in an opponent capture, add the value of the opponent
-    # piece. If the move will result in this player's piece being attacked,
-    # subtract the piece's value. If under attack both before and after the 
-    # move, the score is the negative of the piece value. If the move will
-    # result in placing this player's king in check, the score is the negative
-    # of the king value. If the opponent is placed in check, add half the king
-    # value. If the opponent is placed in check mate, add the full king value.
-    # If a stalemate would occur, subtract one less than the full king value.
+    # one. Scoring starts from zero and adds points to encourage movement or
+    # takes away points to discourage movement. High value is placed on a move
+    # that puts the opponent's king in check (or mate). Lowest value is placed
+    # on any move that results in placing this player's king in check.
     best_moves = []
     best_score = nil
     opponent = (@side == :white) ? :black : :white
@@ -34,37 +25,50 @@ class AI_Player < Player
         print "#{piece}" if @@DEBUG
         piece.get_moves.each do |move|
           score = 0
-          attacked_before = false
-          opponent_piece = @board.getxy(move)
 
           if piece.attacked?
+            # Encourage moving piece out of attack
             score += piece.value
-            attacked_before = true
           end
 
+          opponent_piece = @board.getxy(move)
+          capture_value = 0
           if opponent_piece != nil
+            # Encourage capturing opponent piece
             score += opponent_piece.value
+            capture_value = opponent_piece.value
           end
 
+          # Look ahead a single move
           board = @board.test_move(move, piece)
 
           if board.in_check?(@side)
+            # Highly discourage moving into check
             score = -King.get_value
           elsif board.in_check?(opponent)
             if board.mate?(opponent)
+              # Highly encourage mating opponent
               score += King.get_value
             else
-              score += King.get_value / 2
+              if board.attacked?(move, @side)
+                # If this player is attacked, will it at least be a good trade?
+                score = capture_value - piece.value
+              else
+                # Highly encourage attacking opponent king without being captured
+                score += King.get_value / 2
+              end
             end
           elsif board.mate?(opponent)
-            score = -King.get_value + 1 # stalemate
+            # Highly discourage moving into stalemate
+            score = -King.get_value + 1
           elsif board.attacked?(move, @side)
-            if attacked_before
-              score = -piece.value
-            else
-              score -= piece.value
-            end
+            # If this player is attacked, will it at least be a good trade?
+            score = capture_value - piece.value
           end
+
+          # Avoid unnecessarily moving the king. Without this, it was observed
+          # that a king would often wander into the middle of the board.
+          score = -1 if piece.class == King && score == 0
 
           print " #{Board.to_alg(move)}[#{score}]" if @@DEBUG
 
