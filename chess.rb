@@ -130,6 +130,26 @@ class Chess
     end
   end
 
+  def draw?
+    status = false
+    white, black = @board.get_pieces
+    # Both arrays must contain the king. Discard them.
+    white.delete('k')
+    black.delete('k')
+
+    if white.size == 0
+      if black.size == 0 ||
+         (black.size == 1 && (black.include?('n') || black.include?('b')))
+        status = true
+      end
+    elsif black.size == 0 &&
+          white.size == 1 &&
+          (white.include?('n') || white.include?('b'))
+      status = true
+    end
+    status
+  end
+
   def play
     loop do
       @board = Board.new
@@ -159,6 +179,10 @@ class Chess
           end
         elsif @board.mate?(@side)
           puts "Stalemate!"
+          @game_over = true
+          break
+        elsif draw?
+          puts "Draw!"
           @game_over = true
           break
         end

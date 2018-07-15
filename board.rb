@@ -357,4 +357,40 @@ class Board
     end
     status
   end
+
+  def get_abbreviation(piece)
+    if piece.class == King
+      abbreviation = 'k'
+    elsif piece.class == Queen
+      abbreviation = 'q'
+    elsif piece.class == Rook
+      abbreviation = 'r'
+    elsif piece.class == Bishop
+      abbreviation = 'b'
+    elsif piece.class == Knight
+      abbreviation = 'n'
+    else
+      abbreviation = 'p'
+    end
+  end
+
+  # Returns two arrays - the first of all white pieces on the board, the second
+  # of all black pieces on the board. Both arrays contain piece abbreviations.
+  def get_pieces
+    white = []
+    black = []
+
+    (0..7).each do |x|
+      (0..7).each do |y|
+        piece = @squares[x][y]
+        next if piece == nil
+        if piece.side == :white
+          white << get_abbreviation(piece)
+        else
+          black << get_abbreviation(piece)
+        end
+      end
+    end
+    [white, black]
+  end
 end
