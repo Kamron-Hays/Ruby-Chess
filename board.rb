@@ -201,8 +201,8 @@ class Board
   end
 
   def draw
-    @white_captured.sort!
-    @black_captured.sort!
+    @white_captured.sort!.reverse!
+    @black_captured.sort!.reverse!
     puts
     if @white_captured.size > 0
       print "   "
