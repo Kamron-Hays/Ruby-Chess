@@ -19,9 +19,12 @@ class AI_Player < Player
     # subtract the piece's value. If under attack both before and after the 
     # move, the score is the negative of the piece value. If the move will
     # result in placing this player's king in check, the score is the negative
-    # of the king value.
+    # of the king value. If the opponent is placed in check, add half the king
+    # value. If the opponent is placed in check mate, add the full king value.
+    # If a stalemate would occur, subtract one less than the full king value.
     best_moves = []
     best_score = nil
+    opponent = (@side == :white) ? :black : :white
 
     (0..7).each do |x|
       (0..7).each do |y|
@@ -47,6 +50,14 @@ class AI_Player < Player
 
           if board.in_check?(@side)
             score = -King.get_value
+          elsif board.in_check?(opponent)
+            if board.mate?(opponent)
+              score += King.get_value
+            else
+              score += King.get_value / 2
+            end
+          elsif board.mate?(opponent)
+            score = -King.get_value + 1 # stalemate
           elsif board.attacked?(move, @side)
             if attacked_before
               score = -piece.value
